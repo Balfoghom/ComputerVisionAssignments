@@ -1,0 +1,41 @@
+import cv2
+import numpy as np
+from matplotlib import pyplot as plt
+#image is .gif so must extract frame
+gif = cv2.VideoCapture("kidney-input.gif")
+ret, frame = gif.read()
+cv2.imwrite('image.jpeg', frame)
+#read image, convert to grayscale first, then convert to binary
+I = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY )
+ret,img = cv2.threshold(I, 130, 255, cv2.THRESH_BINARY_INV)
+#Use morphological operators to separate organs that are connected together or to fill small holes in organs.
+kernel = np.ones((5,5),np.uint8)
+closing = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)
+#invert image closing
+image = cv2.bitwise_not(closing, mask = None)
+#labeling objects
+num_labels8, labels8 = cv2.connectedComponents(image,None, 8)
+num_labels, labels = cv2.connectedComponents(image)
+unique, counts = np.unique(labels, return_counts=True)
+print('number of labels = ', num_labels) #including background
+# Map component labels to hue val, 0-179 is the hue range in OpenCV
+print('max label=', np.max(labels))
+label_hue = np.uint8(179 * labels / np.max(labels))
+blank_ch = 255 * np.ones_like(label_hue) #ones_like returns array of given shape and type as given array, with ones,
+labeled_img = cv2.merge([label_hue, blank_ch, blank_ch]) #create HSV image
+# Converting cvt to BGR
+labeled_img = cv2.cvtColor(labeled_img, cv2.COLOR_HSV2BGR)
+# set background label to black (background is also given a label)
+labeled_img[label_hue == 0] = 0
+
+# Showing Images
+cv2.imshow('Input image', I)
+cv2.waitKey(0)
+cv2.imshow("threshode binary inverse",img)
+cv2.waitKey(0)
+cv2.imshow("closing", closing)
+cv2.waitKey(0)
+cv2.imshow("bitwise inverse",image)
+cv2.waitKey(0)
+cv2.imshow('Output image', cv2.cvtColor(labeled_img, cv2.COLOR_BGR2RGB))
+cv2.waitKey(0)
