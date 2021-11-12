@@ -1,0 +1,40 @@
+import cv2
+
+def mouseClick(event, x, y, flags, param):
+    if event == cv2.EVENT_LBUTTONDOWN:  # checks mouse left button down condition
+        print("Coordinates of pixel: X: ", x, "Y: ", y)
+        imgRGB = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        red_RGB = imgRGB[x, y, 0] # prints blue x & y
+        green_RGB = imgRGB[x, y, 1]
+        blue_RGB = imgRGB[x, y, 2]
+        print("pixel in red channel: ", red_RGB,"   pixel in green channel: ", green_RGB,"   pixel in blue channel: ", blue_RGB)
+
+        imgHSV = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+        h_HSV = imgHSV[x, y, 0]
+        s_HSV = imgHSV[x, y, 1]
+        v_HSV = imgHSV[x, y, 2]
+        print("pixel in hue channel: ", h_HSV,"   pixel in saturation channel: ", s_HSV,"   pixel in value channel: [", v_HSV)
+
+        imgHLS = cv2.cvtColor(frame, cv2.COLOR_BGR2HLS)
+        h_HLS = imgHLS[x, y, 0]
+        l_HLS = imgHLS[x, y, 1]
+        s_HLS = imgHLS[x, y, 2]
+        print("pixel in hue channel: ",h_HLS,"   pixel in luminance channel: ",l_HLS,"   pixel in saturation channel: ",s_HLS)
+
+        imgCMY = frame
+        c_imgCMY = 255 - imgCMY[x, y, 2] #c = 255- red is in channel  3 bc of format
+        m_imgCMY = 255 - imgCMY[x, y, 1] # m= 255 - green
+        y_imgCMY = 255 - imgCMY[x, y, 0] # y = 255 - blue
+        print("pixel in cyan channel: ",c_imgCMY,"   pixel in magenta channel: ",m_imgCMY,"   pixel in yellow channel: ",y_imgCMY)
+        print("_______________________________________________________________________________________")
+        print()
+
+cv2.namedWindow('mouseClick')
+cv2.setMouseCallback('mouseClick', mouseClick)
+
+frame = cv2.imread("rubiks-cube.jpg")
+frame = cv2.resize(frame, None, fx=0.5, fy=0.5, interpolation=cv2.INTER_CUBIC)
+
+cv2.imshow('mouseClick', frame)
+
+cv2.waitKey()
